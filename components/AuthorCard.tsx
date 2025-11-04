@@ -46,15 +46,11 @@ const AuthorCard = ({ content }) => {
       <div className="flex max-w-full flex-col items-center justify-center">
         <div className="prose max-w-full pb-8 pt-10 dark:prose-invert xl:text-xl">
           <p>
-            Hello there! I'm David, a self-taught software developer and open-source enthusiast. I'm
-            originally from the 'receding hairline' of California - Humboldt County, Arcata/Eureka
-            where I grew up on a hippie commune far from any tech hubs.
+            Hello there! I'm David, a self-taught software developer and open-source enthusiast based in Fort Worth, TX.
           </p>
 
           <p>
-            My first foray into programming I naively thought the right way to learn to code was to
-            read programming books - starting with the 1,683 page O'Reilly Python Tome.
-            Spoilers:that didn't work too well.
+            My first foray into programming I naively thought the right way to learn to code was to read programming books - starting with the 1,683 page O'Reilly Python Tome. Spoilers:that didn't work too well.
           </p>
 
           <p>
