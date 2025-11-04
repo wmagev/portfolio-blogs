@@ -50,9 +50,9 @@ const AuthorCard = ({ content }) => {
       <div className="flex max-w-full flex-col items-center justify-center">
         <div className="prose max-w-full pb-8 pt-10 dark:prose-invert xl:text-xl">
           <p>
-            Hello there! I'm David, a self-taught software developer and open-source enthusiast.
-            I'm originally from the 'receding hairline' of California - Humboldt County,
-            Arcata/Eureka where I grew up on a hippie commune far from any tech hubs.
+            Hello there! I'm David, a self-taught software developer and open-source enthusiast. I'm
+            originally from the 'receding hairline' of California - Humboldt County, Arcata/Eureka
+            where I grew up on a hippie commune far from any tech hubs.
           </p>
 
           <p>
