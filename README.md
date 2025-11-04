@@ -1,13 +1,11 @@
 <a name="readme-top"></a>
 
-![tailwind-nextjs-banner](/public/static/images/twitter-card.png)
-
 # Welcome to my blog site :)
 
 ![Github last commit][github-last-commit-shield]
 ![Netlify status][netlify-status-shield]
 [![MIT License][license-shield]][license-url]
-![GitHub repo size](https://img.shields.io/github/repo-size/wmagev/davidnguyen.com?style=for-the-badge)
+![GitHub repo size](https://img.shields.io/github/repo-size/wmagev/portfolio?style=for-the-badge)
 [![LinkedIn][linkedin-shield]][linkedin-url]
 
 <details>
