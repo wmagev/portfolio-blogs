@@ -2,12 +2,6 @@
 
 # Welcome to my blog site :)
 
-![Github last commit][github-last-commit-shield]
-![Netlify status][netlify-status-shield]
-[![MIT License][license-shield]][license-url]
-![GitHub repo size](https://img.shields.io/github/repo-size/wmagev/portfolio-blogs?style=for-the-badge)
-[![LinkedIn][linkedin-shield]][linkedin-url]
-
 <details>
 <summary>Table of Contents</summary>
 <ol>
