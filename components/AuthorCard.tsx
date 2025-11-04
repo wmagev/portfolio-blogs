@@ -40,10 +40,6 @@ const AuthorCard = ({ content }) => {
           <div className="flex space-x-3 pt-6">
             <SocialIcon kind="mail" href={`mailto:${email}`} />
             <SocialIcon kind="github" href={github} />
-            <SocialIcon kind="linkedin" href={linkedin} />
-            <SocialIcon kind="twitter" href={twitter} />
-            <SocialIcon kind="bluesky" href={bluesky} />
-            <SocialIcon kind="twitch" href={twitch} />
           </div>
         </div>
       </div>
