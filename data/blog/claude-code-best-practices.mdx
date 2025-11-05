@@ -1,0 +1,475 @@
+---
+title: Claude Code Best Practices - A Comprehensive Guide
+date: '2025-4-18'
+tags: ['AI', 'Claude', 'Developer Tools', 'Productivity']
+draft: false
+summary: Learn how to maximize productivity with Claude Code through proven workflows, optimization strategies, and advanced techniques from Anthropic engineers
+---
+
+Claude Code has transformed how developers interact with AI assistants, turning conversational AI into a powerful coding partner. But like any sophisticated tool, knowing the best practices can dramatically improve your productivity. This comprehensive guide, based on insights from Anthropic's engineering team and community experience, will help you unlock Claude Code's full potential.
+
+## The Foundation: Setup and Customization
+
+### CLAUDE.md Files - Your Project's Instruction Manual
+
+The most impactful way to customize Claude Code is through `CLAUDE.md` files—special configuration files that Claude automatically incorporates into its context. Think of these as instruction manuals that Claude consults before touching your code.
+
+**What to include in CLAUDE.md:**
+
+- **Bash commands with descriptions**: Document custom scripts and their usage
+- **Core files and utility functions**: Highlight critical parts of your codebase
+- **Code style guidelines**: Specify formatting preferences, naming conventions, patterns to follow
+- **Testing instructions**: Explain how to run tests, what frameworks you use
+- **Repository conventions**: Document branching strategies, merge procedures, commit message formats
+- **Developer environment setup**: List dependencies, required tools, environment variables
+- **Project-specific quirks**: Warn about gotchas, legacy code patterns, areas requiring special care
+
+**Strategic placement:**
+
+You can place CLAUDE.md files at multiple levels for different scopes:
+- **Repository root**: Project-specific instructions
+- **Parent directories**: Shared conventions for monorepos
+- **Child directories**: Component or module-specific guidelines
+- **Home folder** (`~/.claude/CLAUDE.md`): Personal preferences that apply across all projects
+
+The `/init` command auto-generates a starter file, but the real power comes from iterative tuning. Use the `#` key during sessions to add instructions that Claude should incorporate automatically.
+
+**Pro tip**: Run your CLAUDE.md files through a prompt improver tool to make them more effective. Emphasize critical instructions with "IMPORTANT" or "YOU MUST" for issues where you've seen Claude make mistakes.
+
+### Managing Tool Permissions
+
+Claude Code requires explicit permission before modifying your system—a crucial safety feature. However, constant permission prompts can disrupt flow. Manage access through:
+
+**During sessions:**
+- Click "Always allow" when prompted for repeated operations
+- Use the `/permissions` command to adjust allowlists on the fly
+
+**Configuration files:**
+- `.claude/settings.json` for project-specific permissions (commit to source control for team sharing)
+- `~/.claude.json` for personal global settings
+
+**CLI flags:**
+- `--allowedTools` for session-specific access
+
+**Permission examples:**
+```
+Edit
+Bash(git commit:*)
+mcp__puppeteer__puppeteer_navigate
+```
+
+This granular control lets you balance safety with productivity—lock down production environments while enabling rapid iteration in development.
+
+### GitHub Integration
+
+Install the GitHub CLI (`gh`) to supercharge Claude's GitHub capabilities. With `gh` available, Claude can:
+- Create and manage pull requests
+- Read PR comments and respond to code reviews
+- Create and triage issues
+- Search repository history
+- Perform complex GitHub operations
+
+No need to configure API tokens—Claude leverages your existing `gh` authentication.
+
+## Extending Capabilities
+
+### Leveraging Your Bash Environment
+
+Claude Code inherits your shell environment, meaning it can access any custom scripts, aliases, or tools you've configured. This is powerful but requires documentation—Claude doesn't automatically know what your custom tools do.
+
+Document important scripts in CLAUDE.md, or instruct Claude to run `--help` flags to discover functionality. This makes your entire developer toolkit available to Claude.
+
+### Model Context Protocol (MCP)
+
+MCP servers extend Claude with specialized capabilities like browser automation, database access, or API integrations. Configure them three ways:
+
+**Project config**: Available only in specific directories
+**Global config**: Accessible across all projects
+**Checked-in `.mcp.json`**: Shareable with your team via source control
+
+Use the `--mcp-debug` flag when troubleshooting configuration issues—it provides detailed diagnostics about MCP server initialization and communication.
+
+### Custom Slash Commands
+
+Slash commands let you package complex prompts into reusable templates. Store them as Markdown files in `.claude/commands/`:
+
+```
+# .claude/commands/fix-github-issue.md
+Fix GitHub issue $ARGUMENTS by:
+1. Reading the issue description
+2. Locating the relevant code
+3. Implementing a fix
+4. Writing tests
+5. Creating a PR
+```
+
+Invoke with: `/project:fix-github-issue 1234`
+
+The `$ARGUMENTS` keyword enables parameterization, turning common workflows into single commands.
+
+## Proven Workflows
+
+### Explore, Plan, Code, Commit - The Foundation
+
+This workflow represents the most reliable path to quality solutions:
+
+**1. Exploration Phase**
+Have Claude read relevant files without writing code yet. This builds context and understanding. For complex investigations, use subagents to preserve your main conversation's context window.
+
+**2. Planning Phase**
+Request a plan before coding. Use progressive thinking triggers:
+- "think" - basic planning
+- "think hard" - more thorough analysis
+- "think harder" - deeper investigation
+- "ultrathink" - maximum computation budget
+
+Document the plan in a file or GitHub issue—this creates a checkpoint you can return to.
+
+**3. Implementation Phase**
+With a solid plan, Claude can implement the solution efficiently.
+
+**4. Commit Phase**
+Commit the changes and update documentation.
+
+**Critical insight from the team**: "Steps #1-#2 are crucial—without them, Claude tends to jump straight to coding a solution." Taking time to explore and plan consistently produces better results than immediate implementation.
+
+### Test-Driven Development with Claude
+
+Claude excels at TDD because it performs best with clear targets to iterate against:
+
+**1. Write tests** based on input/output pairs
+**2. Confirm tests fail** (red phase)
+**3. Commit the tests** (checkpoint)
+**4. Write code** to pass tests (multiple iterations are fine)
+**5. Use subagents** to verify the implementation isn't overfitting to the test cases
+**6. Commit final code** (green phase)
+
+The advantage? Tests provide unambiguous success criteria. Claude can iterate confidently, knowing exactly when it's achieved the goal.
+
+### Visual Iteration - Matching Design Mocks
+
+For UI work, visual feedback dramatically improves results:
+
+**Setup**: Enable browser screenshots through:
+- Puppeteer MCP for web applications
+- iOS simulator MCP for mobile apps
+- Manual screenshot capture and paste
+
+**Workflow:**
+1. Provide a design mock (copy-paste image, file path, or drag-and-drop)
+2. Claude implements initial version
+3. Take a screenshot of the result
+4. Claude compares and refines
+5. Iterate until the implementation matches the mock
+6. Commit when satisfied
+
+**From the team**: "After 2-3 iterations it will typically look much better." Visual targets work like tests—they give Claude concrete feedback to iterate against.
+
+### Safe YOLO Mode - Uninterrupted Automation
+
+For routine tasks like fixing lint errors or generating boilerplate, constant permission prompts hinder productivity. The `--dangerously-skip-permissions` flag enables uninterrupted execution.
+
+**The danger**: Claude can make arbitrary system changes without confirmation.
+
+**Risk mitigation**: Only use in containers without internet access. Anthropic provides a Docker Dev Containers implementation specifically for this use case. This sandboxing lets you get YOLO-mode productivity while containing potential issues.
+
+### Codebase Q&A - Accelerated Onboarding
+
+Ask Claude natural questions about unfamiliar codebases:
+- "How does logging work in this project?"
+- "What does `async move { ... }` do on line 134 of foo.rs?"
+- "Where are API endpoints defined?"
+- "How do we handle authentication?"
+
+Claude agentically searches the code to build comprehensive answers.
+
+**Impact at Anthropic**: "Using Claude Code in this way has become our core onboarding workflow, significantly improving ramp-up time." Instead of bothering senior engineers with basic questions, new team members can explore independently while seniors focus on deep work.
+
+## Git and GitHub Workflows
+
+### Advanced Git Operations
+
+Claude handles sophisticated Git operations beyond basic commits:
+
+**Historical analysis**: Search commit history to answer architectural questions like "why was this designed this way?"
+
+**Contextual commit messages**: Claude reads your changes and writes meaningful commit messages that explain the "why," not just the "what."
+
+**Complex operations**: Reverts, interactive rebase conflicts, cherry-picking, patch grafting—Claude can navigate these with appropriate guidance.
+
+### GitHub Automation
+
+Claude understands "pr" shorthand and can:
+
+**Create pull requests**: Claude reads all commits since branching, generates comprehensive PR descriptions with summaries and test plans.
+
+**Fix code review comments**: Give Claude PR review feedback and it will address comments automatically, understanding context from the full conversation.
+
+**Resolve failing builds**: Claude can read CI logs, identify failures, and implement fixes.
+
+**Triage issues**: In headless mode, Claude can automatically label and categorize incoming issues based on GitHub event triggers.
+
+## Optimization Strategies
+
+### The Power of Specificity
+
+Vague requests lead to back-and-forth clarification. Specific requests get you better results faster.
+
+**Poor**: "add tests for foo.py"
+
+**Good**: "write a new test case for foo.py, covering the edge case where the user is logged out. avoid mocks and use the test database fixture we set up in conftest.py"
+
+The specific version provides:
+- Exact file to modify
+- Specific scenario to test
+- Implementation constraints (no mocks)
+- Context about existing infrastructure (test fixtures)
+
+This reduces course corrections and improves first-attempt success rate.
+
+### Visual Communication
+
+Screenshots are worth a thousand words. Claude can interpret:
+- Design mocks for UI implementation
+- Error messages for debugging
+- Visual bugs for reproduction
+- Architecture diagrams for understanding
+
+**Quick screenshot workflow (macOS)**:
+1. Cmd+Ctrl+Shift+4 to copy selection to clipboard
+2. Ctrl+V in Claude to paste
+
+Or simply drag and drop images into the conversation.
+
+### File References with Tab Completion
+
+Use tab completion to quickly reference files and folders throughout conversations. This ensures accurate paths and helps Claude understand project structure.
+
+### Providing Documentation URLs
+
+Paste documentation or reference links alongside prompts:
+- API documentation for integration tasks
+- Library docs for feature implementation
+- Internal wiki pages for context
+- Stack Overflow threads for specific solutions
+
+Use `/permissions` to allowlist common domains and avoid repeated permission prompts for documentation sites.
+
+### Course Correction Tools
+
+Perfect solutions on first attempt are rare. Claude Code provides several tools for iterative refinement:
+
+**Planning checkpoints**: Ask Claude to plan before coding, review the plan, and adjust if needed.
+
+**Interrupt execution**: Press Escape to stop any phase while preserving context. Claude stops cleanly without losing conversation history.
+
+**Edit previous prompts**: Double-tap Escape to modify earlier prompts and explore alternative approaches without retyping context.
+
+**Undo and retry**: Request that Claude undo recent changes and try a different approach based on what you learned.
+
+**From the team**: "Though Claude Code occasionally solves problems perfectly on the first attempt, using these correction tools generally produces better solutions faster." Think of iterations as features, not bugs.
+
+### Context Window Management
+
+Use `/clear` between unrelated tasks to prevent irrelevant conversation from consuming your context window. This maintains performance and prevents Claude from being distracted by earlier, no longer relevant discussions.
+
+**When to clear:**
+- Switching between unrelated features
+- After completing a discrete task
+- When Claude starts referencing irrelevant earlier context
+- Before starting major new work
+
+### Checklists for Complex Tasks
+
+For migrations, bulk fixes, or multi-step builds, have Claude create a Markdown checklist:
+
+1. Claude analyzes the full scope and creates a checklist
+2. Work through items one-by-one
+3. Claude checks them off as completed
+4. Visual progress tracking keeps complex tasks organized
+
+This prevents losing track in large refactoring projects and provides clear restart points if interrupted.
+
+### Flexible Data Input Methods
+
+Claude accepts data through multiple channels—use whichever fits your workflow:
+
+**Direct input**: Copy-paste text, data, or code snippets
+**Piping**: `cat foo.txt | claude` to feed file contents
+**Bash/MCP**: Ask Claude to fetch via shell commands or MCP tools
+**File reading**: Claude can read files directly from paths
+**URL fetching**: Claude can retrieve web content, including images
+**Screenshots**: Visual data via paste or drag-and-drop
+
+Mixing methods within a single task is perfectly fine—use whatever's most efficient.
+
+## Advanced: Multi-Claude Workflows
+
+### Parallel Code Review
+
+Run multiple Claude instances for separation of concerns:
+
+**Pattern 1**: One Claude writes code, another reviews
+**Pattern 2**: One writes tests, another implements
+
+This separation can yield better results than a single Claude doing both—the "reviewer Claude" approaches code with fresh context and catches issues the "writer Claude" might miss.
+
+### Multiple Repository Checkouts
+
+Create 3-4 Git checkouts in separate folders and run Claude in each with different tasks:
+
+```bash
+git clone <repo> project-1
+git clone <repo> project-2
+git clone <repo> project-3
+```
+
+Cycle through terminals to approve/deny permissions as each Claude requests them. This parallelization can dramatically accelerate work on independent features.
+
+### Git Worktrees - Lightweight Parallelization
+
+Git worktrees provide a lighter alternative to full repository clones:
+
+```bash
+git worktree add ../project-feature-a feature-a
+git worktree add ../project-feature-b feature-b
+```
+
+This creates separate working directories sharing the same Git database, allowing multiple independent tasks without merge conflicts and without duplicating repository data.
+
+**Cleanup**: `git worktree remove ../project-feature-a`
+
+**Pro tips**:
+- Use consistent naming conventions for worktrees
+- Maintain one terminal tab per worktree
+- Set up iTerm2 notifications to alert when Claude needs attention in background tabs
+
+### Headless Mode Integration
+
+The `-p` flag enables programmatic Claude usage in CI pipelines, build scripts, and pre-commit hooks:
+
+```bash
+claude -p "Fix all ESLint errors in this project"
+```
+
+Output via `--output-format stream-json` for automation and parsing.
+
+**Pattern 1 - Fanning Out**: Generate a task list, then loop through calling Claude programmatically on each:
+
+```bash
+# Migrate 2000 files from Framework A to Framework B
+for file in $(find src -name "*.js"); do
+  claude -p "Migrate $file from Framework A to Framework B" --json
+done
+```
+
+**Pattern 2 - Pipelining**: Chain Claude into data processing workflows:
+
+```bash
+claude -p "Extract all TODO comments from this codebase as JSON" --json | \
+  your_processing_command | \
+  another_command
+```
+
+Use `--verbose` for debugging; disable in production for cleaner output.
+
+## Practical Applications
+
+### Automated Issue Triage
+
+Headless mode powers event-driven automation:
+
+```yaml
+# GitHub Actions workflow
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  triage:
+    runs-on: ubuntu-latest
+    steps:
+      - run: claude -p "Read issue #${{ github.event.issue.number }} and assign appropriate labels" --json
+```
+
+Claude analyzes issue content, determines the type (bug, feature, question), checks severity, and applies labels automatically.
+
+### Subjective Code Review
+
+Beyond traditional linting, Claude catches issues that are hard to codify:
+
+- Typos in comments and strings
+- Stale comments that don't match current code
+- Misleading variable or function names
+- Unclear logic that could use comments
+- Inconsistent patterns across the codebase
+
+These subjective quality issues improve code maintainability but don't fit neatly into automated linter rules. Claude's understanding of context and intent makes it excellent at this subjective review layer.
+
+### Jupyter Notebook Integration
+
+Researchers use Claude Code to read and write Jupyter notebooks with full image interpretation:
+
+**Recommended setup**: Side-by-side VS Code windows—one for the notebook, one for Claude Code
+
+**Workflow**:
+1. Claude reads notebook cells including outputs
+2. Interprets visualizations and results
+3. Suggests improvements or debugging fixes
+4. Writes new cells
+5. Iterates based on execution results
+
+**Pro tip**: Request "aesthetically pleasing" visualizations when you need presentation-ready output. Claude will adjust colors, labels, styling, and layout for polish.
+
+## Remember: Experiment and Adapt
+
+As the Anthropic team emphasizes: "Nothing in this list is set in stone nor universally applicable; consider these suggestions as starting points. We encourage you to experiment and find what works best for you!"
+
+Every team, project, and developer has unique needs. The practices outlined here come from real-world experience across Anthropic's engineering organization and the broader Claude Code community, but your mileage may vary.
+
+## Key Principles to Internalize
+
+**Build context before coding**: Exploration and planning consistently outperform immediate implementation.
+
+**Provide clear targets**: Tests, visual mocks, and specific criteria give Claude concrete goals to iterate toward.
+
+**Be specific**: Vague requests lead to clarification loops; specific requests get you better results faster.
+
+**Use course correction tools**: Interruptions, plan revisions, and retries are features—leverage them for better solutions.
+
+**Document for Claude**: CLAUDE.md files, custom commands, and good prompts are investments that pay dividends.
+
+**Parallelize when possible**: Multiple Claude instances, worktrees, and headless automation multiply productivity.
+
+**Manage context**: Clear conversations between tasks; use subagents for investigations; checkpoint plans in files.
+
+## Getting Started
+
+If you're new to Claude Code or haven't explored these advanced features:
+
+1. **Create a CLAUDE.md file**: Start documenting your project conventions
+2. **Install `gh` CLI**: Unlock GitHub integrations
+3. **Try the explore-plan-code-commit workflow**: Experience the power of proper planning
+4. **Experiment with visual iteration**: If you do UI work, this workflow is transformative
+5. **Set up custom slash commands**: Package your common workflows
+6. **Explore MCP servers**: Extend Claude with specialized capabilities
+
+## The Team Behind These Practices
+
+This comprehensive guide draws on collective wisdom from Anthropic's engineering team, particularly insights from Boris Cherny (the article's author), along with contributions from Daisy Hollman, Ashwin Bhat, Cat Wu, Sid Bidasaria, Cal Rueb, Nodir Turakulov, Barry Zhang, Drew Hodun, and the broader Claude Code community.
+
+Their daily use of Claude Code in building AI systems provides battle-tested practices that work at scale.
+
+## Conclusion
+
+Claude Code represents a fundamental shift in developer-AI collaboration. It's not just a chatbot that can write code—it's a sophisticated assistant that can explore codebases, plan solutions, iterate on feedback, and handle complex workflows.
+
+The practices outlined here transform Claude Code from a helpful tool into a force multiplier. Whether you're onboarding to a new codebase, implementing features, fixing bugs, or automating workflows, these techniques will help you work faster and more effectively.
+
+The key is treating Claude as a true collaborator: Give it context, clear objectives, and tools to work with. Use its strengths (exploration, iteration, handling tedious tasks) while providing the human judgment, creativity, and direction it needs.
+
+Start with the basics—CLAUDE.md files, GitHub integration, the explore-plan-code-commit workflow. As you get comfortable, explore advanced techniques like multi-Claude workflows, headless automation, and custom MCP integrations.
+
+Most importantly: experiment. The best practices for your workflow will emerge from trying different approaches and finding what feels productive and natural. Claude Code is flexible enough to adapt to your style, not the other way around.
+
+Welcome to the future of coding—where AI doesn't replace developers but makes them exponentially more effective.
